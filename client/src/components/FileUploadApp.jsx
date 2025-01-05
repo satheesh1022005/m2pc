@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState } from "react";
 import { io } from "socket.io-client";
 import "./style.css";
 function FileUploadApp({ ip }) {
@@ -12,12 +12,11 @@ function FileUploadApp({ ip }) {
       return () => newSocket.close();
     }
   }, [ip]);
-
   const [file, setFile] = useState(null);
   const [status, setStatus] = useState("upload");
   const [fileType, setFileType] = useState({
-    name: '',
-    pages: '',
+    name: "",
+    pages: "",
     pagePerSheet: 0,
     layout: 'portrait',
     color: 'black',
@@ -74,6 +73,7 @@ function FileUploadApp({ ip }) {
       socket.on("uploadSuccess", () => {
         setStatus("Done");
       });
+      setStatus("Done");
     };
 
     reader.readAsArrayBuffer(file);

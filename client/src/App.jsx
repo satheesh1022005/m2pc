@@ -6,8 +6,8 @@ import Home from "./components/Home";
 import "./App.css"
 function App() {
   const [ip, setIP] = useState({
-    ipAddress: '',
-    status: false
+    ipAddress: "",
+    status: false,
   });
 
   return (

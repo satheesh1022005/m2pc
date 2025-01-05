@@ -95,7 +95,10 @@ io.on("connection", (socket) => {
     fs.writeFile(uniqueFileName, Buffer.from(fileData), (err) => {
       if (err) {
         console.error("Error saving file:", err);
-        socket.emit("uploadStatus", { success: false, message: "File upload failed!" });
+        socket.emit("uploadStatus", {
+          success: false,
+          message: "File upload failed!",
+        });
         return;
       }
 
@@ -135,7 +138,9 @@ io.on("connection", (socket) => {
           console.log("File deleted after 30 seconds:", fileName);
 
           // Update metadata
-          const updatedMetadata = readMetadata().filter(item => item.uniqueFileName !== uniqueFileName);
+          const updatedMetadata = readMetadata().filter(
+            (item) => item.uniqueFileName !== uniqueFileName
+          );
           writeMetadata(updatedMetadata);
           io.emit("fileList", updatedMetadata);
         });
