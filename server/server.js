@@ -6,11 +6,16 @@ const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
+const ip = "0.0.0.0";
 
 // Allow CORS for your frontend (localhost:5173)
+app.get("/", (req, res) => {
+  res.json({ message: "Hello from the server!" });
+});
+
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173", // Replace with your frontend's URL
+    origin: "*", // Replace with your frontend's URL
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
   },
@@ -24,16 +29,16 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
-// File metadata storage (will be saved as a JSON file)
+// File metadata storage paths
 const metadataFilePath = path.join(__dirname, "file_metadata.json");
+const priceDataFilePath = path.join(__dirname, "file_price_data.json");
 
-// Utility function to read the file metadata
+// Utility function to read file metadata
 function readMetadata() {
   if (fs.existsSync(metadataFilePath)) {
-    const data = fs.readFileSync(metadataFilePath, "utf-8");
-    return JSON.parse(data); // Parse JSON data from the file
+    return JSON.parse(fs.readFileSync(metadataFilePath, "utf-8"));
   }
-  return []; // Return an empty array if the file doesn't exist
+  return [];
 }
 
 // Utility function to write file metadata
@@ -41,32 +46,50 @@ function writeMetadata(data) {
   fs.writeFileSync(metadataFilePath, JSON.stringify(data, null, 2), "utf-8");
 }
 
+// Utility function to read price data
+function readPriceData() {
+  if (fs.existsSync(priceDataFilePath)) {
+    return JSON.parse(fs.readFileSync(priceDataFilePath, "utf-8"));
+  }
+  return [];
+}
+
+// Utility function to write price data
+function writePriceData(priceData) {
+  const existingData = readPriceData();
+  existingData.push(priceData);
+  fs.writeFileSync(priceDataFilePath, JSON.stringify(existingData, null, 2), "utf-8");
+}
+
 // Utility function to generate a unique file name if a file with the same name already exists
 function getUniqueFilePath(fileName) {
-  const filePath = path.join(uploadDir, fileName);
-  let uniqueFilePath = filePath;
+  const extname = path.extname(fileName);
+  const basename = path.basename(fileName, extname);
+  let uniqueFilePath = path.join(uploadDir, fileName);
   let counter = 1;
 
-  // Generate a unique file name (a1, a2, a3, ...) if the file exists
   while (fs.existsSync(uniqueFilePath)) {
-    const extname = path.extname(fileName);
-    const basename = path.basename(fileName, extname);
-    uniqueFilePath = path.join(uploadDir, `${basename}${counter}${extname}`);
+    uniqueFilePath = path.join(uploadDir, `${basename}_${counter}${extname}`);
     counter++;
   }
 
   return uniqueFilePath;
 }
+
+// WebSocket handling
 io.on("connection", (socket) => {
   console.log("Client connected");
-
+  io.emit("fileList", readMetadata());
+      io.emit("dataList", readPriceData());
   socket.on("uploadFile", (data) => {
     const { fileName, fileData, fileType, userInfo } = data;
-    console.log("File data received:", fileName);
 
-    // Generate a unique file path
+    if (!fileName || !fileData || !fileType) {
+      socket.emit("uploadStatus", { success: false, message: "Invalid file data!" });
+      return;
+    }
+
     const uniqueFileName = getUniqueFilePath(fileName);
-    const originalFileName = fileName;
 
     // Save the file
     fs.writeFile(uniqueFileName, Buffer.from(fileData), (err) => {
@@ -81,7 +104,7 @@ io.on("connection", (socket) => {
       // Update and save metadata
       const metadata = readMetadata();
       const fileMetadata = {
-        fileName: originalFileName,
+        fileName,
         uniqueFileName,
         fileType,
         userInfo,
@@ -91,18 +114,25 @@ io.on("connection", (socket) => {
       metadata.push(fileMetadata);
       writeMetadata(metadata);
 
+      // Save price data
+      const priceData = {
+        price: fileType.price || "Unknown",
+        uploadTime: new Date(),
+      };
+      writePriceData(priceData);
+
       socket.emit("uploadStatus", { success: true, message: `File uploaded successfully: ${fileName}` });
       io.emit("fileList", metadata);
+      io.emit("dataList", readPriceData());
 
       // Schedule file deletion after 30 seconds
       setTimeout(() => {
-        // Delete the file
         fs.unlink(uniqueFileName, (err) => {
           if (err) {
             console.error("Error deleting file:", err);
             return;
           }
-          console.log("File deleted after 30 seconds:", originalFileName);
+          console.log("File deleted after 30 seconds:", fileName);
 
           // Update metadata
           const updatedMetadata = readMetadata().filter(item => item.uniqueFileName !== uniqueFileName);
@@ -119,6 +149,6 @@ io.on("connection", (socket) => {
 });
 
 // Start the server
-server.listen(port, () => {
+server.listen(port, ip, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
