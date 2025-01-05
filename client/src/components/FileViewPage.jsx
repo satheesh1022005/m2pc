@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
+import GetIpAddress from "./GetIpAddress";
 
-const FileViewPage = () => {
+const FileViewPage = ({ ip }) => {
   const [files, setFiles] = useState([]); // State to hold file metadata
   const [error, setError] = useState(null); // State to hold error messages
 
   useEffect(() => {
+    if (!ip) {
+      return;
+    }
+
     // Connect to the WebSocket server
-    const socket = io("http://192.168.217.157:3000"); // Replace with your server URL
+    const socket = io(`http://${ip}:3000`); // Replace with your server URL
 
     // Listen for the 'fileList' event to get file metadata
     socket.on("fileList", (fileMetadata) => {
@@ -25,19 +30,22 @@ const FileViewPage = () => {
     return () => {
       socket.disconnect();
     };
-  }, []);
-  console.log(files);
+  }, [ip]);
 
   // Reverse the array to show the latest file first
   const reversedFiles = [...files].reverse();
+
+  // Handle the print functionality for a selected file
   const handlePrint = (file) => {
     // Here, you can add logic to prepare the data for printing
     console.log("Printing file:", file);
     window.print(); // Opens the print dialog
   };
+
   return (
     <div>
       <h1>File List</h1>
+      {error && <p style={{ color: "red" }}>{error}</p>}
       {reversedFiles.length === 0 ? (
         <p>No files found</p>
       ) : (

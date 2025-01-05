@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { io } from "socket.io-client";
 
-const socket = io("http://192.168.217.157:3000"); // Connect to WebSocket server
+const socket = io("http://localhost:3000"); // Connect to WebSocket server
 
 function FileUploadApp() {
   const [file, setFile] = useState(null);
@@ -55,7 +55,6 @@ function FileUploadApp() {
     setStatus("uploading");
     const reader = new FileReader();
 
-    // Convert file to binary string to send over WebSocket
     reader.onload = () => {
       const arrayBuffer = reader.result;
       socket.emit("uploadFile", {
@@ -67,7 +66,12 @@ function FileUploadApp() {
       setStatus("Done");
     };
 
-    reader.readAsArrayBuffer(file); // Read file as ArrayBuffer
+    reader.readAsArrayBuffer(file);
+  };
+
+  // Handle input changes for fileType
+  const handleInputChange = (field, value) => {
+    setFileType((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -96,17 +100,17 @@ function FileUploadApp() {
       />
       <select
         value={fileType.layout}
-        onChange={(e) => setFileType({ ...fileType, layout: e.target.value })}
+        onChange={(e) => handleInputChange("layout", e.target.value)}
       >
         <option value="portrait">Portrait</option>
         <option value="landscape">Landscape</option>
       </select>
       <select
         value={fileType.color}
-        onChange={(e) => setFileType({ ...fileType, color: e.target.value })}
+        onChange={(e) => handleInputChange("color", e.target.value)}
       >
-        <option value="color">color</option>
-        <option value="black">black</option>
+        <option value="color">Color</option>
+        <option value="black">Black</option>
       </select>
       <input
         type="checkbox"
