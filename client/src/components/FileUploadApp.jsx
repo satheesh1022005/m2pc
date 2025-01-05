@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, {useMemo, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import "./style.css";
+import data from "./printData";
 function FileUploadApp({ ip }) {
   const [socket, setSocket] = useState(null);
 
@@ -34,7 +35,7 @@ function FileUploadApp({ ip }) {
       temp_pages = Number(arr[1]) - Number(arr[0]);
     }
 
-    const price = (Number(temp_pages) / fileType.pagePerSheet) * 1.5;
+    const price = (Number(temp_pages) / fileType.pagePerSheet) * (fileType.color==='black'?data.price.black:data.price.color);  
 
     if (fileType.flip) {
       return price / 2;

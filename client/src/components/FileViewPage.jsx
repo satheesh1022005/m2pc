@@ -2,12 +2,24 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import PriceCalculator from './PriceCalculator';
 import "./style.css"
+import NavBar from './Navbar';
 const FileViewPage = ({ ip }) => {
   const [files, setFiles] = useState([]);
   const [price, setPrice] = useState([]);
   const [error, setError] = useState(null);
-  const [toggle,setToggle] =useState(false);
+  const [toggle, setToggle] = useState(false);
+  const [validUser, setValidUser] = useState(false);
+  const [navbarData,setNavbarData] = useState("dashboard");
   useEffect(() => {
+    if (!validUser) {
+      const password = window.prompt("Enter admin password");
+      if (password !== "admin") {
+        window.location.href = "/";
+      }
+      else {
+        setValidUser(true)
+      }
+    }
     if (!ip) {
       console.warn('IP address not provided');
       setError('Server IP not provided');
@@ -53,62 +65,73 @@ const FileViewPage = ({ ip }) => {
       console.log(price[i].price);
     }
   }
-
+  console.log(navbarData)
   return (
     <>
-    <h1 className='file-view'>File View</h1>
-    <div className="container">
-      <h1>List of Files to be Printed</h1>
-      {reversedFiles.length === 0 ? (
-        <p>No files found</p>
-      ) : (
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>File Name</th>
-              <th>Pages</th>
-              <th>Layout</th>
-              <th>Color</th>
-              <th>Pages Per Sheet</th>
-              <th>Price</th>
-              <th>Uploaded Time</th>
-              <th>Print</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reversedFiles.map((file, index) => (
-              <tr key={file.uniqueFileName || index}>
-                <td>{file?.fileType?.name || 'N/A'}</td>
-                <td>{file.fileName}</td>
-                <td>{file?.fileType?.pages || 'N/A'}</td>
-                <td>{file?.fileType?.layout || 'N/A'}</td>
-                <td>{file?.fileType?.color || 'N/A'}</td>
-                <td>{file?.fileType?.pagePerSheet || 'N/A'}</td>
-                <td>{file?.fileType?.price === 'Unknown' ? '1.5' : file?.fileType?.price.toFixed(2) || '0'}</td>
-                <td>{new Date(file.uploadTime).toLocaleString()}</td>
-                <td>
-                  <button onClick={() => handlePrint(file)}>Print</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-      <div className="total-revenue">
-        Total Revenue: <span>{totalRevenue.toFixed(2)}</span>
-      </div>
-      <div onClick={() => setToggle(!toggle)} className="toggle-button">
-        View Revenue at range
-      </div>
-      {toggle && (
-        <div className="price-calculator">
+      <NavBar setNavbarData={setNavbarData}/>
+      {validUser &&(
+      navbarData === "dashboard" ?  
+      <>
+        <div className="container">
+          <h1>List of Files to be Printed</h1>
+          {reversedFiles.length === 0 ? (
+            <p>No files found</p>
+          ) : (
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>File Name</th>
+                  <th>Pages</th>
+                  <th>Layout</th>
+                  <th>Color</th>
+                  <th>Pages Per Sheet</th>
+                  <th>Price</th>
+                  <th>Uploaded Time</th>
+                  <th>Print</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reversedFiles.map((file, index) => (
+                  <tr key={file.uniqueFileName || index}>
+                    <td>{file?.fileType?.name || 'N/A'}</td>
+                    <td>{file.fileName}</td>
+                    <td>{file?.fileType?.pages || 'N/A'}</td>
+                    <td>{file?.fileType?.layout || 'N/A'}</td>
+                    <td>{file?.fileType?.color || 'N/A'}</td>
+                    <td>{file?.fileType?.pagePerSheet || 'N/A'}</td>
+                    <td>{file?.fileType?.price === 'Unknown' ? '1.5' : file?.fileType?.price.toFixed(2) || '0'}</td>
+                    <td>{new Date(file.uploadTime).toLocaleString()}</td>
+                    <td>
+                      <button onClick={() => handlePrint(file)}>Print</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          <div className="total-revenue">
+            Total Revenue: <span>{totalRevenue.toFixed(2)}</span>
+          </div>
+          <div onClick={() => setToggle(!toggle)} className="toggle-button">
+            View Revenue at range
+          </div>
+          {toggle && (
+            <div className="price-calculator">
+              <PriceCalculator data={price} />
+            </div>
+          )
+          }
+
+        </div>
+      </>
+      :
+      navbarData === "revenue" ? 
+      <>
         <PriceCalculator data={price} />
-      </div>
-      )
-      }
-      
-    </div>
+      </>
+        :<div>This is the settings Page</div>
+    )}
     </>
   );
 };

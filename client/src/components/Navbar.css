@@ -1,0 +1,16 @@
+.navbar-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgb(186, 209, 254);
+    padding: 1.5em 1em;
+    border: 1px solid black;
+    font-weight: bold;
+}
+.home-menu{
+    display: flex;
+}
+.home-menu div{
+    margin-inline: 1em;
+    cursor: pointer;
+}
