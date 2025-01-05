@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
+import React, { useState, useEffect } from "react";
+import io from "socket.io-client";
 
 const FileViewPage = () => {
   const [files, setFiles] = useState([]); // State to hold file metadata
@@ -7,18 +7,18 @@ const FileViewPage = () => {
 
   useEffect(() => {
     // Connect to the WebSocket server
-    const socket = io('http://localhost:3000'); // Replace with your server URL
-    
+    const socket = io("http://192.168.217.157:3000"); // Replace with your server URL
+
     // Listen for the 'fileList' event to get file metadata
-    socket.on('fileList', (fileMetadata) => {
-      console.log('Received file metadata:', fileMetadata);
+    socket.on("fileList", (fileMetadata) => {
+      console.log("Received file metadata:", fileMetadata);
       setFiles(fileMetadata); // Update state with received metadata
     });
 
     // Error handling for WebSocket connection
-    socket.on('connect_error', (err) => {
-      console.error('WebSocket error:', err);
-      setError('Error connecting to the server');
+    socket.on("connect_error", (err) => {
+      console.error("WebSocket error:", err);
+      setError("Error connecting to the server");
     });
 
     // Clean up the WebSocket connection when the component is unmounted
@@ -26,16 +26,15 @@ const FileViewPage = () => {
       socket.disconnect();
     };
   }, []);
-  console.log(files)
-  
+  console.log(files);
 
   // Reverse the array to show the latest file first
   const reversedFiles = [...files].reverse();
   const handlePrint = (file) => {
     // Here, you can add logic to prepare the data for printing
-    console.log('Printing file:', file);
+    console.log("Printing file:", file);
     window.print(); // Opens the print dialog
-  }
+  };
   return (
     <div>
       <h1>File List</h1>
@@ -45,7 +44,7 @@ const FileViewPage = () => {
         <table border="1" cellPadding="10">
           <thead>
             <tr>
-                <th>Name</th>
+              <th>Name</th>
               <th>File Name</th>
               <th>Pages</th>
               <th>Layout</th>
@@ -65,7 +64,9 @@ const FileViewPage = () => {
                 <td>{file.fileType.color}</td>
                 <td>{file.fileType.pagePerSheet}</td>
                 <td>{new Date(file.uploadTime).toLocaleString()}</td>
-                <td><button onClick={() => handlePrint(file)}>Print</button></td>
+                <td>
+                  <button onClick={() => handlePrint(file)}>Print</button>
+                </td>
               </tr>
             ))}
           </tbody>

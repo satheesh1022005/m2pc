@@ -6,11 +6,13 @@ const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
-
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
 // Allow CORS for your frontend (localhost:5173)
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173", // Replace with your frontend's URL
+    origin: "*", // Replace with your frontend's URL
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
   },
@@ -72,7 +74,10 @@ io.on("connection", (socket) => {
     fs.writeFile(uniqueFileName, Buffer.from(fileData), (err) => {
       if (err) {
         console.error("Error saving file:", err);
-        socket.emit("uploadStatus", { success: false, message: "File upload failed!" });
+        socket.emit("uploadStatus", {
+          success: false,
+          message: "File upload failed!",
+        });
         return;
       }
 
@@ -91,7 +96,10 @@ io.on("connection", (socket) => {
       metadata.push(fileMetadata);
       writeMetadata(metadata);
 
-      socket.emit("uploadStatus", { success: true, message: `File uploaded successfully: ${fileName}` });
+      socket.emit("uploadStatus", {
+        success: true,
+        message: `File uploaded successfully: ${fileName}`,
+      });
       io.emit("fileList", metadata);
 
       // Schedule file deletion after 30 seconds
@@ -105,7 +113,9 @@ io.on("connection", (socket) => {
           console.log("File deleted after 30 seconds:", originalFileName);
 
           // Update metadata
-          const updatedMetadata = readMetadata().filter(item => item.uniqueFileName !== uniqueFileName);
+          const updatedMetadata = readMetadata().filter(
+            (item) => item.uniqueFileName !== uniqueFileName
+          );
           writeMetadata(updatedMetadata);
           io.emit("fileList", updatedMetadata);
         });
@@ -120,5 +130,5 @@ io.on("connection", (socket) => {
 
 // Start the server
 server.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+  console.log(`Server is running at http:"0.0.0.0":${port}`);
 });
