@@ -1,0 +1,46 @@
+.ip-table{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.ip-table>div{
+    margin-block: 2em;
+}
+.ip-table input{
+    outline: none;
+    padding: 1em 2em;
+    border-radius: 0.25em;
+    border: 1px solid rgb(168, 168, 168);
+}
+.ip-table button{
+    padding: 1em 2em;
+    border-radius: 0.25em;
+    border: 1px solid rgb(168, 168, 168);
+    background-color: rgb(3, 0, 77);
+    color: white;
+    cursor: pointer;
+}
+.ip-table button:hover{ 
+    background-color: rgb(0, 0, 0);
+}
+
+.home{
+    background-color: #fff;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.home-buttons{
+    display: flex;
+    margin-block: 2em;
+    gap: 1em;
+}
+.home-buttons button{ 
+    background-color: lightblue;
+    border: none;
+    padding: 2em 3em;
+}
