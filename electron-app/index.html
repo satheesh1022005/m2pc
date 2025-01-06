@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Server Manager</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f0f0f0;
+      }
+
+      .button-container {
+        margin-bottom: 20px;
+      }
+
+      button {
+        padding: 10px 20px;
+        margin-right: 10px;
+        font-size: 14px;
+        cursor: pointer;
+        background-color: #087fbb;
+        color: white;
+        border: none;
+        border-radius: 4px;
+      }
+
+      button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+      }
+
+      button:hover:not(:disabled) {
+        background-color: #044261;
+      }
+
+      #status {
+        background-color: white;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        height: 400px;
+        overflow-y: auto;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+
+      #status div {
+        margin-bottom: 5px;
+        padding: 2px 5px;
+        border-bottom: 1px solid #eee;
+      }
+
+      #url {
+        margin: 20px;
+        width: 300px;
+        text-align: center;
+        padding: 10px;
+        background-color: #087fbb;
+        border-radius: 4px;
+      }
+      #url a {
+        font-size: 18px;
+        font-weight: bold;
+        color: #ffffff;
+        text-decoration: none;
+        border-bottom: 2px solid #00796b;
+        padding-bottom: 2px;
+      }
+
+      #url a:hover {
+        color: #e9eaeb;
+        border-color: #004d40;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="button-container">
+      <button id="startButton" onclick="launchApplication()">
+        Start Servers
+      </button>
+      <button id="stopButton" onclick="terminateApplication()">
+        Stop Servers
+      </button>
+    </div>
+    <section id="url">
+      <a
+        href="http://localhost:5173/"
+        id="external-link"
+        target="_blank"
+        rel="noopener noreferrer"
+        >Click me to open the application</a
+      >
+    </section>
+    <div id="status"></div>
+    <script src="renderer.js"></script>
+  </body>
+</html>

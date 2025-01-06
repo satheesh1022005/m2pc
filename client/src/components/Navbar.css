@@ -1,0 +1,60 @@
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f4f6fa;
+  padding: 1.5em 1em;
+  border-bottom: 2px solid #d1d9e6;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: "Roboto", sans-serif;
+}
+
+.navbar {
+  font-size: 1.5em;
+  color: #3a3d5e; /* Professional dark text color */
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.home-menu {
+  display: flex;
+  gap: 1.5em; /* Consistent spacing between menu items */
+}
+
+.home-menu div {
+  font-size: 1em;
+  color: #5a6d91; /* Subtle, calming blue-gray color */
+  cursor: pointer;
+  padding: 0.5em 1em;
+  border-radius: 8px; /* Rounded edges for a modern look */
+  transition: all 0.3s ease-in-out; /* Smooth hover animations */
+  user-select: none;
+}
+
+.home-menu div:hover {
+  background-color: #e6effc; /* Soft blue hover effect */
+  color: #2b3a60; /* Slightly darker text on hover */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow on hover */
+}
+
+.home-menu div:active {
+  transform: scale(0.95); /* Click feedback */
+}
+
+.navbar-container:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(
+    90deg,
+    #69b7f6,
+    #4a90e2,
+    #355ca3
+  ); /* Gradient accent bar */
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
+}
