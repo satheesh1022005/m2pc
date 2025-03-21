@@ -19,13 +19,13 @@ function App() {
     <>
       <Router>
         <Routes>
-          
+
           {ipAddress.status && (
             <>
           <Route path="/" element={<FileUploadApp ip={ipAddress.ip}/>} />
           <Route path="/admin" element={<FileViewPage ip={ipAddress.ip}/>} />
           </>
-          )}     
+          )}
         </Routes>
       </Router>
     </>

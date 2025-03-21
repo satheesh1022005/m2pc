@@ -37,10 +37,10 @@ function startNodeServer() {
   return new Promise((resolve, reject) => {
     const serverDir = path.join(__dirname, "..", "server");
     console.log("Server Directory:", serverDir);
-
+    const shell = process.platform === "win32" ? "cmd.exe" : "/bin/bash";
     const nodeServer = childProcess.spawn("node", ["server.js"], {
       cwd: serverDir,
-      shell: true,
+      shell: shell,
     });
 
     serverProcesses["node-server"] = nodeServer;
