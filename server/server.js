@@ -6,14 +6,19 @@ const path = require("path");
 const QRCode = require("qrcode");
 const app = express();
 const cors = require("cors");
+const cron = require("node-cron");
+const { PDFDocument } = require('pdf-lib');
+const db = require("./db");
 const server = http.createServer(app);
 const ip = "0.0.0.0";
 const metadataFilePath = path.join(__dirname, "file_metadata.json");
 const priceDataFilePath = path.join(__dirname, "file_price_data.json");
 const shopDataFilePath = path.join(__dirname, "shop_data.json");
+
 // Allow CORS for your frontend (localhost:5173)
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.get("/", (req, res) => {
   res.json({ message: "Hello from the server!" });
 });
@@ -29,14 +34,14 @@ app.get("/pricing", (req, res) => {
   }
 });
 app.post("/update-pricing", (req, res) => {
-  console.log(req.body);
   let { blackPrice, colorPrice } = req.body;
+  console.log(req.body);
   blackPrice = parseInt(blackPrice);
   colorPrice = parseInt(colorPrice);
   if (typeof blackPrice !== "number" || typeof colorPrice !== "number") {
     return res.status(400).json({ error: "Invalid data format" });
   }
-
+  console.log(blackPrice, colorPrice);
   try {
     // Read the current data
     const data = fs.readFileSync(shopDataFilePath, "utf-8");
@@ -47,6 +52,7 @@ app.post("/update-pricing", (req, res) => {
     shopData.colorPrice = colorPrice;
 
     // Write the updated data back to the file
+    console.log(shopData);
     fs.writeFileSync(
       shopDataFilePath,
       JSON.stringify(shopData, null, 2),
@@ -170,11 +176,39 @@ io.on("connection", (socket) => {
 
       // Save price data
       const priceData = {
-        price: fileType.price || "Unknown",
+        price: fileType.price || 1,
         uploadTime: new Date(),
       };
       writePriceData(priceData);
-
+      (async () => {
+        try {
+          await db.query(
+            `INSERT INTO uploaded_files (
+              file_name, unique_file_name, file_path, upload_time,
+              file_type_name, file_type_pages, file_type_page_per_sheet,
+              file_type_layout, file_type_color, file_type_price, file_type_flip,
+              user_ip_address
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+              fileMetadata.fileName,
+              fileMetadata.uniqueFileName,
+              fileMetadata.filePath,
+              new Date(fileMetadata.uploadTime), // ensure it's a valid Date
+              fileType.name || null,
+              fileType.pages || null,
+              fileType.pagePerSheet || null,
+              fileType.layout || null,
+              fileType.color || null,
+              fileType.price || 0,
+              fileType.flip ? 1 : 0,
+              userInfo?.ipAddress || null
+            ]
+          );
+          console.log("Inserted file metadata into MySQL successfully");
+        } catch (err) {
+          console.error("Error inserting file metadata into MySQL:", err);
+        }
+      })();
       socket.emit("uploadStatus", {
         success: true,
         message: `File uploaded successfully: ${fileName}`,
@@ -183,23 +217,33 @@ io.on("connection", (socket) => {
       io.emit("dataList", readPriceData());
 
       // Schedule file deletion after 30 seconds
-      setTimeout(() => {
-        fs.unlink(uniqueFileName, (err) => {
-          if (err) {
-            console.error("Error deleting file:", err);
-            return;
-          }
-          console.log("File deleted after 30 seconds:", fileName);
 
-          // Update metadata
-          const updatedMetadata = readMetadata().filter(
-            (item) => item.uniqueFileName !== uniqueFileName
-          );
-          writeMetadata(updatedMetadata);
-          io.emit("fileList", updatedMetadata);
-        });
-      }, 30000); // 30 seconds
     });
+  });
+  cron.schedule("*/30 * * * * *", () => {
+    console.log("Running cleanup task...");
+
+    const metadata = readMetadata();
+    const updatedMetadata = [];
+
+    metadata.forEach((file) => {
+      const fileAge = (Date.now() - new Date(file.uploadTime).getTime()) / 1000;
+
+      if (fileAge > 30) {
+        try {
+          fs.unlinkSync(file.uniqueFileName);
+          console.log(`Deleted file: ${file.uniqueFileName}`);
+        } catch (err) {
+          console.error(`Error deleting file ${file.uniqueFileName}:`, err);
+        }
+      } else {
+        updatedMetadata.push(file);
+      }
+    });
+
+    // Save updated metadata (only files not deleted)
+    writeMetadata(updatedMetadata);
+    io.emit("fileList", updatedMetadata);
   });
 
   socket.on("disconnect", () => {

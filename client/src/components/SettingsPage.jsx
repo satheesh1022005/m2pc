@@ -8,7 +8,7 @@ const SettingsPage = ({ ip }) => {
   const [webDetails, setWebDetails] = useState({ ip: "", port: "" });
   const [qrCodeData, setQrCodeData] = useState("");
   const [ipqrCodeData, setIpQrCodeData] = useState("");
-  const [pricing, setPricing] = useState({ blackPrize: 1, colorPrize: 5 });
+  const [pricing, setPricing] = useState({ blackPrice: 1, colorPrice: 5 });
 
   // Handle input changes
   const handleInputChange = (e, setState) => {
@@ -104,7 +104,7 @@ const SettingsPage = ({ ip }) => {
           <label>Black & White Price (₹):</label>
           <input
             type="number"
-            name="blackPrize"
+            name="blackPrice"
             value={pricing.black}
             onChange={(e) => handleInputChange(e, setPricing)}
           />
@@ -113,7 +113,7 @@ const SettingsPage = ({ ip }) => {
           <label>Color Price (₹):</label>
           <input
             type="number"
-            name="colorPrize"
+            name="colorPrice"
             value={pricing.color}
             onChange={(e) => handleInputChange(e, setPricing)}
           />

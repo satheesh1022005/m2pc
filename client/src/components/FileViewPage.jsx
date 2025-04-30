@@ -90,7 +90,24 @@ const FileViewPage = ({ ip }) => {
       cancelButtonText: "Cancel",
     }).then((result) => {
       if (result.isConfirmed) {
-        window.print();
+        const fileURL = `http://${ip}:3000/uploads/${file.fileName}`;
+
+  const printWindow = window.open('', '_blank');
+  if (printWindow) {
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print</title>
+        </head>
+        <body style="margin:0">
+          <iframe src="${fileURL}" style="border:none; width:100%; height:100vh;" onload="this.contentWindow.focus(); this.contentWindow.print();"></iframe>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  } else {
+    console.error("Failed to open print window");
+  }
         Swal.fire({
           icon: "success",
           title: "Print Started",
@@ -147,7 +164,7 @@ const FileViewPage = ({ ip }) => {
                         <td>
                           {file?.fileType?.price === "Unknown"
                             ? "1.5"
-                            : file?.fileType?.price.toFixed(2) || "0"}
+                            : file?.fileType?.price || "0"}
                         </td>
                         <td>{new Date(file.uploadTime).toLocaleString()}</td>
                         <td>

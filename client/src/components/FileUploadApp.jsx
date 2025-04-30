@@ -48,18 +48,23 @@ function FileUploadApp({ ip }) {
 
   const calculatePrice = () => {
     let temp_pages = fileType.pages;
+    let numPages = 1;
+
     if (temp_pages.includes("-")) {
       const arr = temp_pages.split("-");
-      temp_pages = Number(arr[1]) - Number(arr[0]);
+      console.log(arr);
+      numPages = Number(arr[1]) - Number(arr[0]) + 1;
+    } else if (!isNaN(Number(temp_pages)) && temp_pages.trim() !== "") {
+      numPages = Number(temp_pages);
     }
-
-    const copyPrice =
-      (Number(temp_pages) / fileType.pagePerSheet) *
-      (fileType.color === "black" ? price.blackPrice : price.colorPrice);
-    console.log(copyPrice);
     console.log(price);
+    console.log(numPages);
+    const copyPrice =
+      (numPages / fileType.pagePerSheet) *
+      (fileType.color === "black" ? price.blackPrice || 1 : price.colorPrice || 5);
+    console.log("copyPrice"+copyPrice);
     if (fileType.flip) {
-      return price / 2;
+      return Math.round(copyPrice) + copyPrice - copyPrice / 2;
     }
     if (!isFinite(copyPrice)) {
       return 1;
@@ -67,8 +72,9 @@ function FileUploadApp({ ip }) {
     return copyPrice;
   };
 
-  const calculatedPrice = useMemo(() => calculatePrice(), [fileType, file]);
 
+  const calculatedPrice = useMemo(() => calculatePrice(), [fileType, file]);
+  console.log(calculatedPrice);
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
@@ -106,6 +112,7 @@ function FileUploadApp({ ip }) {
   const handleInputChange = (field, value) => {
     setFileType((prev) => ({ ...prev, [field]: value }));
   };
+
   return (
     <div className="file-upload-container">
       <div className="file-upload-app">
@@ -196,7 +203,7 @@ function FileUploadApp({ ip }) {
         <button className="upload-button" onClick={handleUpload}>
           Upload File
         </button>
-        <div className="price">Price: {calculatedPrice.toFixed(2)}</div>
+        <div className="price">Price: {calculatedPrice}</div>
       </div>
     </div>
   );
