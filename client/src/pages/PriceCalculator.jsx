@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./style.css";  // Import the custom CSS file
+
 
 const PriceCalculator = ({ data }) => {
   const [startDate, setStartDate] = useState("");
@@ -14,7 +14,10 @@ const PriceCalculator = ({ data }) => {
       alert("Please select valid start and end dates!");
       return;
     }
-
+    if(start > end) {
+      alert("Start date cannot be after end date!");
+      return;
+    }
     const filteredData = data.filter((item) => {
       const itemDate = new Date(item.uploadTime);
       return itemDate >= start && itemDate <= end && typeof item.price === "number";
@@ -29,7 +32,7 @@ const PriceCalculator = ({ data }) => {
       <h2 className="price-calculator-header">Revenue Calculator</h2>
       <div className="input-group">
         <label>
-          Start Date: 
+          Start Date:
           <input
             type="date"
             value={startDate}
@@ -40,7 +43,7 @@ const PriceCalculator = ({ data }) => {
       </div>
       <div className="input-group">
         <label>
-          End Date: 
+          End Date:
           <input
             type="date"
             value={endDate}
@@ -49,8 +52,8 @@ const PriceCalculator = ({ data }) => {
           />
         </label>
       </div>
-      <button 
-        onClick={calculateTotalPrice} 
+      <button
+        onClick={calculateTotalPrice}
         className="calculate-btn"
       >
         Calculate Total Revenue

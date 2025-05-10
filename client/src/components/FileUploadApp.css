@@ -1,0 +1,110 @@
+.upload-container {
+  max-width: 900px;
+  margin: 50px auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.upload-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 28px;
+  color: #333;
+}
+
+.upload-header {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  justify-content: center;
+}
+
+.input-field {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  width: 200px;
+  font-size: 15px;
+}
+
+.file-input {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  width: 200px;
+}
+
+.file-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.file-table th,
+.file-table td {
+  padding: 14px;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+  font-size: 15px;
+}
+
+.file-table th {
+  background: #f9f9f9;
+  color: #444;
+}
+
+.file-table td {
+  color: #555;
+}
+
+.file-table button {
+  margin: 0 6px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.file-table button:hover {
+  opacity: 0.9;
+}
+
+.file-table button:first-child {
+  background: #4caf50;
+  color: #fff;
+}
+
+.file-table button:last-child {
+  background: #e53935;
+  color: #fff;
+}
+
+.summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 25px;
+}
+
+.summary h3 {
+  font-size: 22px;
+  color: #333;
+}
+
+.upload-btn {
+  padding: 12px 24px;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.upload-btn:hover {
+  background: #1565c0;
+}

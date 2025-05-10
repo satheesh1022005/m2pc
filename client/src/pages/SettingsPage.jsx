@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import QRCode from "react-qr-code";
 import axios from "axios";
-import "./SettingsPage.css"; // Plain CSS file for styling
+import "./SettingsPage.css";
 
 const SettingsPage = ({ ip }) => {
   const [wifiDetails, setWifiDetails] = useState({ ssid: "", password: "" });
